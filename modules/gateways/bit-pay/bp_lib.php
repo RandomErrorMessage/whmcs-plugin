@@ -72,7 +72,7 @@ function bpCurl($url, $apiKey, $post = false)
     curl_setopt($curl, CURLOPT_FRESH_CONNECT, 1);
 
     $responseString = curl_exec($curl);
-    
+
     if ($responseString == false) {
         $response = array('error' => curl_error($curl));
         bpLog('[ERROR] In modules/gateways/bitpay/bp_lib.php::bpCurl(): Invalid response received: ' . var_export($response, true));
@@ -90,7 +90,7 @@ function bpCurl($url, $apiKey, $post = false)
     return $response;
 }
 
-public function getFullUri($baseUri, $path)
+function getFullUri($baseUri, $path)
 {
     $uriNormalized = rtrim($baseUri, '/');
     $pathNormalized = ltrim($path, '/');
@@ -142,7 +142,7 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array())
     $options['orderID']  = $orderId;
     $options['price']    = $price;
 
-    $btcpayUrl = getFullUri($options['btcpayUrl'],"/invoice");
+    $btcpayUrl = getFullUri($options['btcpayUrl'],"/invoices");
 
     $postOptions = array('orderID', 'itemDesc', 'itemCode', 'notificationEmail', 'notificationURL', 'redirectURL',
         'posData', 'price', 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName',
@@ -223,8 +223,8 @@ function bpGetInvoice($invoiceId, $apiKey = false, $btcpayUrl = null)
         $apiKey = $bpOptions['apiKey'];
     }
 
-    $btcpayUrl = getFullUri($options['btcpayUrl'],"/invoice");
-    $response = bpCurl($btcpayUrl . $invoiceId, $apiKey);
+    $btcpayUrl = getFullUri($options['btcpayUrl'],"/invoices");
+    $response = bpCurl($btcpayUrl . '/' . $invoiceId, $apiKey)['data'];
 
     if (is_string($response)) {
         return $response; // error
